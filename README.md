@@ -30,8 +30,8 @@ The QC steps follow the following general pipeline:
 
 1. Genotyping vcf files are converted to PLINK bed/bim/fam files
 2. Variants from PLINK files are filtered with the PLINK arguments missing, hardy, test-missing, freq, and het
-a. Variants within PAR also removed
-b. hardy and het are run on ancestry-delimited files. So if a variant fails in one ancestry, then it is removed from every ancestry
+    - Variants within PAR also removed
+    - hardy and het are run on ancestry-delimited files. So if a variant fails in one ancestry, then it is removed from every ancestry
 3. Sex Check removes additional individuals
 4. Run and filter from MDS
 5. Remove GCATs
