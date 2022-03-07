@@ -36,15 +36,6 @@ def run_IBD_QC(file_header):
         for i in to_remove:
             out.write(i + '\n')
 
-def create_plink(input,output):
-    # take in an input vcf file, convert to an output plink file
-    subprocess.run([plink2,'--vcf',input,'--out',output],check=True)
-
-def run_multiple_plinks(inpu_files,outpu_files):
-    # run create_plink on many files
-    for i,j in enumerate(inpu_files,outpu_files):
-        create_plink(i,j)
-
 def reformat_bim(bim,output='same',format='snpid'):
     # take in a bim file, reformat it
     # options for reformat are snpid (default) in chr:pos format or concat in chr_pos_ref_alt
