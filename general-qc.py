@@ -285,12 +285,4 @@ def identify_gcats():
     subprocess.run([plink2,'--bfile',data+'.clean.snps1.mind.0.02.sexcheck_het_out_no_outliers.clean.snps2','--exclude',data+'_GCATs_to_remove_RELATED.txt','--make-bed','--out',data+'.clean.snps1.mind.0.02.sexcheck_het_out_no_outliers.clean.snps2_no_GCATs'],check=True)
     subprocess.run([plink2,'--noweb','--bfile',data+'.clean.snps1.mind.0.02.sexcheck_het_out_no_outliers.clean.snps2_no_GCATs','--chr','23','--make-bed','--out',data+'.clean.snps1.mind.0.02.sexcheck_het_out_unrelated_no_outliers_no_GCATs_no_GCATs_chr_X'],check=True)
 
-def prep_frequency_file(bfile):
-    subprocess.run([plink2,'--bfile',data+bfile,'--freq','--out',data+bfile+'.freq'],check=True)
-    subprocess.run(['perl','x','-b',data+bfile+'.bim','-f',data+bfile+'.freq.frq','-r','/humgen/diabetes/users/josep/PartnersBIOBANK/HRC_info/HRC.r1-1.GRCh37.wgs.mac5.sites.tab','-h'],check=True)
-    subprocess.run(['cp','/humgen/diabetes/users/josep/PartnersBIOBANK/PartnersMerged/Run-plink.sh','Run-plink.sh'],check=True)
-    subprocess.run("sed -i 's/x4927_x5352_x4784.clean.snps1.mind.0.02.sexcheck_unrelated_no_outliers_no_GCATs-updated/" + data + ".clean.snps1.mind.0.02.sexcheck_het_out_no_outliers.clean.snps2_no_GCATs/g' Run-plink.sh",shell=True,check=True)
-    subprocess.run(['sed','-i',"'s/x4927_x5352_x4784.clean.snps1.mind.0.02.sexcheck_unrelated_no_outliers_no_GCATs/"+data+".clean.snps1.mind.0.02.sexcheck_het_out_no_outliers.clean.snps2_no_GCATs/g'",'Run-plink.sh'],check=True)
-    subprocess.run(['sh','Run-plink.sh'],check=True)
-
-    subprocess.run(['bash','run_flashpca.sh',data + '.clean.snps1.mind.0.02.sexcheck_het_out_no_outliers.clean.snps2_no_GCATs',data+'_PCs_RELATED','20'],check=True)
+    
