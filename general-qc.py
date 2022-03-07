@@ -303,20 +303,3 @@ def prep_frequency_file(bfile):
     subprocess.run(['sh','Run-plink.sh'],check=True)
 
     subprocess.run(['bash','run_flashpca.sh',data + '.clean.snps1.mind.0.02.sexcheck_het_out_no_outliers.clean.snps2_no_GCATs',data+'_PCs_RELATED','20'],check=True)
-
-def run_phase():
-    # run phasing qsub scripts
-    for anc in ancestries:
-        header = anc + '/' + data + '.' + anc
-        for i in range(1,23):
-            with open(data + '.submit_phasing.thread.16.chr.' + i + '.sh','w') as out:
-                out.write('/humgen/diabetes/users/josep/apps/shapeit -B ' + header + '.clean.snps1.mind.0.02.sexcheck_het_out_unrelated_no_outliers.clean.snps2_no_GCATs-updated-chr' + i + ' -M /humgen/diabetes/users/josep/refPanels/1000G_phase3/1000GP_Phase3/genetic_map_chr' + i + '_combined_b37.txt -T 16 -O ' + header + '.thread.16.chr.' + i + '.haps.gz')
-            subprocess.run(['qsub','-cwd','-N','chr.'+i+'.phase','-l','h_rt=480:00:00','-j','y','-R','y','-l','h_vmem=16G','-pe','smp','8','-binding','linear:16',data+'.submit_phasing.thread.16.chr.'+i+'.sh'],check=True)
-
-def convert_haps_to_vcf():
-    # run shapeit to convert hap file to vcf
-    for anc in ancestries:
-        header = anc + '/' + data + '.' + anc
-        with open('convert_haps.sh','w') as out:
-            out.write('/humgen/diabetes/users/josep/apps/shapeit --convert --input-haps ' + header + '.RELATED.chr.${SGE_TASK_ID}.haps.gz --output-vcf ' + header + '.RELATED.chr.${SGE_TASK_ID}.haps.gz.vcf --thread 8')
-        subprocess.run(['qsub','-cwd','-N','convert_job_arrays','-j','y','-l','h_rt=10:00:00','-l','h_vmem=16G','-t','1-22','-o',anc+'-convert_haps.log','convert_haps.sh'])
