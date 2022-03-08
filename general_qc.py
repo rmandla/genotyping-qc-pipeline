@@ -87,7 +87,7 @@ def first_anc_pass(plink2,directory,header,ancestry_file_path,ancestry_matrix,an
         out = header +'.' + ANC
         subprocess.run([plink2,'--bfile',input_bfile,'--keep',ANC + '_to_include_'+header+'.txt','--make-bed','--out',out],check=True)
 
-def filter_plinkfiles(plink2,directory,header,pheno_files,ancestries,missing=True,test_missing=True,freq=True,het=True,hwe=True):
+def filter_plinkfiles(plink2,directory,header,pheno_files,ancestries,missing=True,test_missing=True,freq=True,hwe=True):
     # run a series of filtering steps with plink
     # pheno_files and ancestry_files must be lists
     data_dir = directory+header
@@ -99,13 +99,11 @@ def filter_plinkfiles(plink2,directory,header,pheno_files,ancestries,missing=Tru
         tests.append('test-missing')
     if freq:
         tests.append('freq')
-    if het:
-        tests.append('het')
     if hwe:
         tests.append('hardy')
 
     for i in tests: # missing, test-missing, freq run all together; no hardy/het on others; test-missing to compare array batch
-        if i != 'hardy' and i != 'het': # run on missing, test-missing, and freq
+        if i != 'hardy': # run on missing, test-missing, and freq
             if i == 'test-missing':
                 # need phenotype data, so use array batches for initial run
                 for j in pheno_files:
@@ -116,7 +114,7 @@ def filter_plinkfiles(plink2,directory,header,pheno_files,ancestries,missing=Tru
                     subprocess.run([plink2,'--bfile',data_dir,'--pheno',j,'--'+i,'--out',header+'-'+out_tail],check=True)
             else:
                 subprocess.run([plink2,'--bfile',data_dir,'--' + i,'--out',header],check=True)
-        elif i == 'hardy' or i == 'het':
+        else:
             for ANC in ancestries:
                 anc_header = header+'.'+ANC
                 subprocess.run([plink2,'--bfile',anc_header,'--'+i,'--out',anc_header],check=True)
@@ -271,7 +269,7 @@ def remove_gcat_dups(plink2,header):
 def run_qc(plink2,directory,header,ancestry_file_path,ancestry_matrix,pheno_files,pca_bimfile=None,ancestry_file_anccolname='race_cat',ancestry_file_idcolname='Subject ID',miss_cutoff=0.05,test_missing_cutoff=0.00005,maf_cutoff=0.0005,hwe_cutoff=1e-10,mds=False):
     ancestries = list(ancestry_matrix.keys())
     first_anc_pass(plink2,directory,header,ancestry_file_path,ancestry_matrix,ancestries,ancestry_file_anccolname=ancestry_file_anccolname,ancestry_file_idcolname=ancestry_file_idcolname)
-    filter_plinkfiles(plink2,directory,header,pheno_files,ancestries,missing=True,test_missing=True,freq=True,het=True,hwe=True)
+    filter_plinkfiles(plink2,directory,header,pheno_files,ancestries,missing=True,test_missing=True,freq=True,hwe=True)
     filter_tables(plink2,directory,header,ancestries,miss_cutoff=miss_cutoff,test_missing_cutoff=test_missing_cutoff,maf_cutoff=maf_cutoff,hwe_cutoff=hwe_cutoff)
     sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancestry_file_anccolname=ancestry_file_anccolname,ancestry_file_idcolname=ancestry_file_idcolname)
     remove_gcat_dups(plink2,header)
