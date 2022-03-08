@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-plink2 = # path to plink2 executable
 
 def run_IBD_QC(file_header):
     imiss = pd.read_table(file_header + '.imiss',delim_whitespace=True, usecols=['FID','IID','F_MISS'])
@@ -240,7 +239,7 @@ def extract_nonGCAT(header,pca_bimfile=None,return_gcats=True):
     if return_gcats:
         bfile = header + '.clean.snps1.mind.0.02.sexcheck_het_out.clean.snps2.bim'
     else:
-        bfile = pca_bfile
+        bfile = pca_bimfile
     bim = pd.read_table(bfile,header=None,delim_whitespace=True)
     bim['geno'] = bim[4]+'_'+bim[5]
     if return_gcats:
@@ -275,7 +274,7 @@ def remove_gcat_dups(header):
     dups[[1]].to_csv(header+'_duplicated_SNPs_to_remove.txt',index=None,header=None)
     subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02.sexcheck_het_out.clean.snps2_no_GCATs','--exclude',header+'_duplicated_SNPs_to_remove.txt','--make-bed','--out',header+'.clean.snps1.mind.0.02.sexcheck_het_out.clean.snps2_no_GCATs_no_DUPS'],check=True)
 
-def run_qc(directory,header,ancestry_file_path,ancestry_matrix,pheno_files,pca_bimfile,ancestry_file_anccolname='race_cat',ancestry_file_idcolname='Subject ID',miss_cutoff=0.05,test_missing_cutoff=0.00005,maf_cutoff=0.0005,hwe_cutoff=1e-10):
+def run_qc(plink2,directory,header,ancestry_file_path,ancestry_matrix,pheno_files,pca_bimfile=None,ancestry_file_anccolname='race_cat',ancestry_file_idcolname='Subject ID',miss_cutoff=0.05,test_missing_cutoff=0.00005,maf_cutoff=0.0005,hwe_cutoff=1e-10):
     ancestries = list(ancestry_matrix.keys())
     first_anc_pass(directory,header,ancestry_file_path,ancestry_matrix,ancestries,ancestry_file_anccolname=ancestry_file_anccolname,ancestry_file_idcolname=ancestry_file_idcolname)
     filter_plinkfiles(directory,header,pheno_files,ancestries,missing=True,test_missing=True,freq=True,het=True,hwe=True)
@@ -283,7 +282,7 @@ def run_qc(directory,header,ancestry_file_path,ancestry_matrix,pheno_files,pca_b
     sex_check(header,ancestries,ancestry_file_path,ancestry_matrix,ancestries_strict=None,ancestry_file_anccolname=ancestry_file_anccolname,ancestry_file_idcolname=ancestry_file_idcolname)
     # identify subjects related by IBD
     #check_relatedness(header)
-    extract_nonGCAT(header,pca_bimfile=pca_bimfile,return_gcats=False)
+    #extract_nonGCAT(header,pca_bimfile=pca_bimfile,return_gcats=False)
     #prep_for_mds(header,pca_bedfile)
     remove_gcat_dups(header)
     subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02.sexcheck_het_out.clean.snps2_no_GCATs_no_DUPS','--maf','0.0005','--make-bed','--out',header+'.clean.snps1.mind.0.02.sexcheck_het_out.clean.snps2_no_GCATs_no_DUPS_maf_0.0005'])
