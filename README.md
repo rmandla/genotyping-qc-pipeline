@@ -11,6 +11,7 @@ This code was written and tested in Python 3.9 and has the following dependencie
 Python
 * Pandas
 * Numpy
+* seaborn/matplotlib
 
 Other
 * plink2
@@ -18,9 +19,6 @@ Other
 * QCTool
 * flashpca
 * shapeit4.2
-
-Optional
-* seaborn/matplotlib
 
 Imputation is performed using TOPMed
 
@@ -37,3 +35,10 @@ The QC steps follow the following general pipeline:
 5. Remove GCATs
 6. Phase
 7. Impute
+
+## Scripts
+
+* `general_qc.py` - Python functions useful for removing SNPs and individuals from starting, non-qc'd data
+* `mgbb-mega-qc.py` - Python script example of running QC steps 1-5 with the `run_qc` function
+* `sep-by-chr.sh` - Shell script for separating plink bed/bim/fam file outputs from `run_qc` by chromosome, and convert to vcf files
+* `run-shapeit.sh` - Shell script for running shapeit on `sep-by-chr.sh` outputs
