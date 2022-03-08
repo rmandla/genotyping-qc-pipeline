@@ -203,7 +203,7 @@ def sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancest
 
     for ANC in ancestries_strict:
         # concat all subjects that are outliers from het for removal
-        if anc == 'EU':
+        if ANC == 'EU':
             subprocess.run('cat ' + ANC + '_samples_to_outliers_het.txt > ' + header + '_samples_to_outliers_het.txt',shell=True,check=True)
         else:
             subprocess.run('tail -n +2 ' + ANC + '_samples_to_outliers_het.txt >> ' + header + '_samples_to_outliers_het.txt',shell=True,check=True)
