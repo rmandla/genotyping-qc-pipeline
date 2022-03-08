@@ -71,7 +71,7 @@ def create_fams(files):
 def first_anc_pass(plink2,directory,header,ancestry_file_path,ancestry_matrix,ancestries,ancestry_file_anccolname='race_cat',ancestry_file_idcolname='Subject ID',input_bfile=None):
     pheno=pd.read_table(ancestry_file_path)
     data_dir = directory+header
-    FAM_phenos=pd.read_table(data_dir + ".fam",header=None)
+    FAM_phenos=pd.read_table(data_dir + ".fam",header=None,delim_whitespace=True)
     FAM_phenos['final_ID']=FAM_phenos[1].str.split('-',expand=True)[1].astype(int)
     ancestries = list(ancestry_matrix.keys())
 
@@ -175,7 +175,7 @@ def sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancest
     subprocess.run([plink2,'--bfile',header+'.clean.snps1','--mind','0.02','--make-bed','--out',header+'.clean.snps1.mind.0.02'],check=True)
     first_anc_pass(plink2,'./',header+'.clean.snps1.mind.0.02',ancestry_file_path,ancestry_matrix,ancestries,ancestry_file_anccolname=ancestry_file_anccolname,ancestry_file_idcolname=ancestry_file_idcolname)
 
-    sex_check_samples = pd.read_table(header + '.clean.snps1.sexcheck',delim_whitespace=True)
+    sex_check_samples = pd.read_table(header + '.clean.snps1.mind.0.02.sexcheck',delim_whitespace=True)
     to_remove_sex_check_samples = sex_check_samples[(sex_check_samples['STATUS']=='PROBLEM') & (sex_check_samples['PEDSEX'] != 0)] # when pedsex != genetic sex
     to_remove_sex_check_samples = to_remove_sex_check_samples.iloc[:, [0,1]].drop_duplicates()
     to_remove_sex_check_samples.to_csv(header+'_samples_to_sex_check.txt',sep='\t',index=None)
