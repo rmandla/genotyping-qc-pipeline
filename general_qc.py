@@ -173,7 +173,7 @@ def filter_tables(plink2,directory,header,ancestries,miss_cutoff=0.05,test_missi
 def sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancestries_strict=None,ancestry_file_anccolname='race_cat',ancestry_file_idcolname='Subject ID',input_bfile=None):
     subprocess.run([plink2,'--bfile',header+'.clean.snps1','--check-sex','--out',header+'.clean.snps1'],check=True)
     subprocess.run([plink2,'--bfile',header+'.clean.snps1','--mind','0.02','--make-bed','--out',header+'.clean.snps1.mind.0.02'],check=True)
-    first_anc_pass('./',header+'.clean.snps1',ancestry_file_path,ancestry_matrix,ancestries)
+    first_anc_pass(plink2,'./',header,ancestry_file_path,ancestry_matrix,ancestries,ancestry_file_anccolname=ancestry_file_anccolname,ancestry_file_idcolname=ancestry_file_idcolname)
 
     sex_check_samples = pd.read_table(header + '.clean.snps1.sexcheck',delim_whitespace=True)
     to_remove_sex_check_samples = sex_check_samples[(sex_check_samples['STATUS']=='PROBLEM') & (sex_check_samples['PEDSEX'] != 0)] # when pedsex != genetic sex
