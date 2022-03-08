@@ -133,7 +133,7 @@ def filter_tables(plink2,directory,header,ancestries,miss_cutoff=0.05,test_missi
                 d = pd.read_table(file,delim_whitespace=True)
                 d = d[d['F_MISS']>miss_cutoff]
                 snps_for_exclusion += d['SNP'].to_list()
-            elif footer == '.missing' and 'txt' in i:
+            elif footer == '.missing':
                 d = pd.read_table(file,delim_whitespace=True)
                 d = d[d['P']<test_missing_cutoff]
                 snps_for_exclusion += d['SNP'].to_list()
@@ -170,7 +170,7 @@ def filter_tables(plink2,directory,header,ancestries,miss_cutoff=0.05,test_missi
     subprocess.run([plink2,'--bfile',data_dir,'--exclude',header + '.all_SNPs_to_remove_u.txt','--make-bed','--out',header+'.clean.snps1'],check=True)
     subprocess.run([plink2,'--bfile',header+'.clean.snps1','--exclude',header+'.to_removeForPCA_freq.txt','--make-bed','--out',header+'.clean.snps1_MAF_05_forMDS'],check=True)
 
-def sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancestries_strict=None,ancestry_file_anccolname='race_cat',ancestry_file_idcolname='Subject ID',input_bfile=None,mds=False):
+def sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancestry_file_anccolname='race_cat',ancestry_file_idcolname='Subject ID',input_bfile=None,mds=False):
     subprocess.run([plink2,'--bfile',header+'.clean.snps1','--check-sex','--out',header+'.clean.snps1'],check=True)
     subprocess.run([plink2,'--bfile',header+'.clean.snps1','--mind','0.02','--make-bed','--out',header+'.clean.snps1.mind.0.02'],check=True)
     first_anc_pass(plink2,'./',header+'.clean.snps1',ancestry_file_path,ancestry_matrix,ancestries,ancestry_file_anccolname=ancestry_file_anccolname,ancestry_file_idcolname=ancestry_file_idcolname)
@@ -181,12 +181,8 @@ def sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancest
     to_remove_sex_check_samples.to_csv(header+'_samples_to_sex_check.txt',sep='\t',index=None)
 
     subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02','--remove',header+'_samples_to_sex_check.txt','--make-bed','--out',header+'.clean.snps1.mind.0.02.sexcheck'],check=True)
-    if ancestries_strict == None:
-        ancestries_strict = ancestries
-        if "Other" in ancestries:
-            ancestries_strict.remove('Other')
 
-    for ANC in ancestries_strict:
+    for ANC in ancestries:
         subprocess.run([plink2,'--bfile',header+'.clean.snps1.'+ANC,'--allow-no-sex','--het','--out',header+'.clean.snps1.mind.0.02.'+ANC],check=True) # by ancestry
         het_samples = pd.read_table(header+'.clean.snps1.mind.0.02.'+ANC+'.het',delim_whitespace=True)
         mean = np.mean(het_samples['F'])
@@ -201,7 +197,7 @@ def sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancest
         plt.savefig(header+'-hist_F_het.pdf')
         plt.clf()
 
-    for ANC in ancestries_strict:
+    for ANC in ancestries:
         # concat all subjects that are outliers from het for removal
         if ANC == 'EU':
             subprocess.run('cat ' + ANC + '_samples_to_outliers_het.txt > ' + header + '_samples_to_outliers_het.txt',shell=True,check=True)
@@ -277,10 +273,6 @@ def run_qc(plink2,directory,header,ancestry_file_path,ancestry_matrix,pheno_file
     first_anc_pass(plink2,directory,header,ancestry_file_path,ancestry_matrix,ancestries,ancestry_file_anccolname=ancestry_file_anccolname,ancestry_file_idcolname=ancestry_file_idcolname)
     filter_plinkfiles(plink2,directory,header,pheno_files,ancestries,missing=True,test_missing=True,freq=True,het=True,hwe=True)
     filter_tables(plink2,directory,header,ancestries,miss_cutoff=miss_cutoff,test_missing_cutoff=test_missing_cutoff,maf_cutoff=maf_cutoff,hwe_cutoff=hwe_cutoff)
-    sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancestries_strict=None,ancestry_file_anccolname=ancestry_file_anccolname,ancestry_file_idcolname=ancestry_file_idcolname)
-    # identify subjects related by IBD
-    #check_relatedness(header)
-    #extract_nonGCAT(header,pca_bimfile=pca_bimfile,return_gcats=False)
-    #prep_for_mds(header,pca_bedfile)
+    sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancestry_file_anccolname=ancestry_file_anccolname,ancestry_file_idcolname=ancestry_file_idcolname)
     remove_gcat_dups(plink2,header)
     subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02.sexcheck_het_out_no_GCATs_no_DUPS','--maf','0.0005','--make-bed','--out',header+'.clean.snps1.mind.0.02.sexcheck_het_out_no_GCATs_no_DUPS_maf_0.0005'])
