@@ -242,7 +242,7 @@ def extract_nonGCAT(header,pca_bimfile=None,return_gcats=True):
     bim['geno'] = bim[4]+'_'+bim[5]
     if return_gcats:
         bim_gcat=bim[~bim['geno'].isin(['A_C','A_G','C_A','C_T','G_A','G_T'])]
-        bim_gcat.drop(columns=['geno']).to_csv(header+'_GCATs_to_remove.txt',sep='\t',header=None,index=None)
+        bim_gcat[[1]].to_csv(header+'_GCATs_to_remove.txt',sep='\t',header=None,index=None)
         return
     bim_no_gcat=bim[bim['geno'].isin(['A_C','A_G','C_A','C_T','G_A','G_T'])]
     bim_no_gcat['SNP'] = bim_no_gcat[0].astype(str) + '_' + bim_no_gcat[3].astype(str) + '_' + bim_no_gcat['geno']
@@ -267,7 +267,7 @@ def filter_from_mds(plink2,header):
 def remove_gcat_dups(plink2,header):
     extract_nonGCAT(header,return_gcats=True)
     subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02.sexcheck_het_out','--exclude',header+'_GCATs_to_remove.txt','--make-bed','--out',header+'.clean.snps1.mind.0.02.sexcheck_het_out_no_GCATs'],check=True)
-    bim = pd.read_table(header+'.clean.snps1.mind.0.02.sexcheck_het_out_no_GCATs',delim_whitespace=True,header=None)
+    bim = pd.read_table(header+'.clean.snps1.mind.0.02.sexcheck_het_out_no_GCATs.bim',delim_whitespace=True,header=None)
     dups = bim[bim[3].duplicated()]
     dups[[1]].to_csv(header+'_duplicated_SNPs_to_remove.txt',index=None,header=None)
     subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02.sexcheck_het_out_no_GCATs','--exclude',header+'_duplicated_SNPs_to_remove.txt','--make-bed','--out',header+'.clean.snps1.mind.0.02.sexcheck_het_out_no_GCATs_no_DUPS'],check=True)
