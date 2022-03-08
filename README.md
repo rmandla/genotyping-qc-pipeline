@@ -40,5 +40,5 @@ The QC steps follow the following general pipeline:
 
 * `general_qc.py` - Python functions useful for removing SNPs and individuals from starting, non-qc'd data
 * `mgbb-mega-qc.py` - Python script example of running QC steps 1-5 with the `run_qc` function
-* `sep-by-chr.sh` - Shell script for separating plink bed/bim/fam file outputs from `run_qc` by chromosome, and convert to vcf files
-* `run-shapeit.sh` - Shell script for running shapeit on `sep-by-chr.sh` outputs
+* `sep-by-chr.sh` - Shell script for separating plink bed/bim/fam file outputs from `run_qc` by chromosome, and convert to vcf files. An intermediate step between steps 5 and 6.
+* `run-shapeit.sh` - Shell script for running shapeit on `sep-by-chr.sh` output. Use to run step 6
