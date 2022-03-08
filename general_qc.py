@@ -125,10 +125,10 @@ def filter_tables(plink2,directory,header,ancestries,miss_cutoff=0.05,test_missi
     # take in files outputted from filter_plinkfiles, filter based on specific criteria and output a list of SNPs for exclusion
     snps_for_exclusion = []
     footers = ['.lmiss','.missing','.frq','.hwe']
-    for footer in footers:
-        file = header + footer
-        out_name = file + '.to_remove.txt'
-        if file in os.listdir():
+    for file in os.listdir():
+        footer = '.'+file.split('.')[-1]
+        if footer in footers:
+            out_name = file + '.to_remove.txt'
             if footer == '.lmiss':
                 d = pd.read_table(file,delim_whitespace=True)
                 d = d[d['F_MISS']>miss_cutoff]
