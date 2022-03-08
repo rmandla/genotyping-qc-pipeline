@@ -198,7 +198,7 @@ def sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancest
         fig, axes = plt.subplots(1, 2)
         sns.histplot(het_samples['F'],ax=axes[0])
         sns.boxplot(het_samples['F'],ax=axes[1])
-        plt.savefig(anc_header+'-hist_F_het.pdf')
+        plt.savefig(header+'-hist_F_het.pdf')
         plt.clf()
 
     for ANC in ancestries_strict:
