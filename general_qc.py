@@ -187,15 +187,14 @@ def sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancest
             ancestries_strict.remove('Other')
 
     for ANC in ancestries_strict:
-        anc_header = header + '.' + ANC
-        subprocess.run([plink2,'--bfile',anc_header+'.clean.snps1','--allow-no-sex','--het','--out',anc_header+'.clean.snps1.mind.0.02'],check=True) # by ancestry
-        het_samples = pd.read_table(anc_header+'.clean.snps1.mind.0.02.het',delim_whitespace=True)
+        subprocess.run([plink2,'--bfile',header+'.clean.snps1.'+ANC,'--allow-no-sex','--het','--out',header+'.clean.snps1.mind.0.02.'+ANC],check=True) # by ancestry
+        het_samples = pd.read_table(header+'.clean.snps1.mind.0.02.'+ANC+'.het',delim_whitespace=True)
         mean = np.mean(het_samples['F'])
         std = np.std(het_samples['F'])
         max_val = mean + std * 4
         min_val = mean - std * 4
         het_samples_outliers = het_samples[(het_samples['F']>max_val) | (het_samples['F']<min_val)].iloc[:, [0,1]]
-        het_samples_outliers.to_csv(anc_header+'_samples_to_outliers_het.txt',sep='\t',index=None)
+        het_samples_outliers.to_csv(ANC+'_samples_to_outliers_het.txt',sep='\t',index=None)
         fig, axes = plt.subplots(1, 2)
         sns.histplot(het_samples['F'],ax=axes[0])
         sns.boxplot(het_samples['F'],ax=axes[1])
@@ -204,17 +203,16 @@ def sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancest
 
     for ANC in ancestries_strict:
         # concat all subjects that are outliers from het for removal
-        anc_header = header + '.' + ANC
         if anc == 'EU':
-            subprocess.run('cat ' + anc_header + '_samples_to_outliers_het.txt > ' + header + '_samples_to_outliers_het.txt',shell=True,check=True)
+            subprocess.run('cat ' + ANC + '_samples_to_outliers_het.txt > ' + header + '_samples_to_outliers_het.txt',shell=True,check=True)
         else:
-            subprocess.run('tail -n +2 ' + anc_header + '_samples_to_outliers_het.txt >> ' + header + '_samples_to_outliers_het.txt',shell=True,check=True)
+            subprocess.run('tail -n +2 ' + ANC + '_samples_to_outliers_het.txt >> ' + header + '_samples_to_outliers_het.txt',shell=True,check=True)
 
-    subprocess.run([plink2,'--bfile',data+'.clean.snps1.mind.0.02.sexcheck','--remove',data+'_samples_to_outliers_het.txt','--make-bed','--out',data+'.clean.snps1.mind.0.02.sexcheck_het_out'],check=True)
-    subprocess.run([plink2,'--bfile',data+'.clean.snps1.mind.0.02.sexcheck_het_out','--remove',data+'_samples_to_sex_check.txt','--make-bed','--out',data+'.clean.snps1.mind.0.02.sexcheck'],check=True)
-    subprocess.run([plink2,'--bfile',data+'.clean.snps1.mind.0.02.sexcheck_het_out','--exclude',data+'.to_removeForPCA_freq.txt','--make-bed','--out',data+'.clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS'],check=True)
-    subprocess.run([plink2,'--bfile',data+'.clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS','--exclude','range','/humgen/diabetes/users/josep/PartnersBIOBANK/high-LD-regions_hg19.txt','--indep-pairwise','50','5','0.2','--out',data+'.clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS_prunnedSNPs'],check=True)
-    subprocess.run([plink2,'--bfile',data+'.clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS','--extract',data+'.clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS_prunnedSNPs.prune.in','--genome','--out',data+'.clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS_prunnedSNPs'],check=True)
+    subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02.sexcheck','--remove',header+'_samples_to_outliers_het.txt','--make-bed','--out',header+'.clean.snps1.mind.0.02.sexcheck_het_out'],check=True)
+    subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02.sexcheck_het_out','--remove',header+'_samples_to_sex_check.txt','--make-bed','--out',header+'.clean.snps1.mind.0.02.sexcheck'],check=True)
+    subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02.sexcheck_het_out','--exclude',header+'.to_removeForPCA_freq.txt','--make-bed','--out',header+'.clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS'],check=True)
+    subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS','--exclude','range','/humgen/diabetes/users/josep/PartnersBIOBANK/high-LD-regions_hg19.txt','--indep-pairwise','50','5','0.2','--out',header+'.clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS_prunnedSNPs'],check=True)
+    subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS','--extract',header+'.clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS_prunnedSNPs.prune.in','--genome','--out',header+'.clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS_prunnedSNPs'],check=True)
 
 def check_relatedness(plink2,header):
     subprocess.run("awk '{ if ($10 > 0.185) { print } }' "+header+".clean.snps1.mind.0.02.sexcheck_het_out_MAF_05_forMDS_prunnedSNPs.genome > "+header+"pairs_0.185",shell=True,check=True)
