@@ -235,7 +235,7 @@ def extract_nonGCAT(header,pca_bimfile=None,return_gcats=True):
     bim = pd.read_table(bfile,header=None,delim_whitespace=True)
     bim['geno'] = bim[4]+'_'+bim[5]
     if return_gcats:
-        bim_gcat=bim[~bim['geno'].isin(['C_G','G_C','A_T','T_A'])]
+        bim_gcat=bim[bim['geno'].isin(['C_G','G_C','A_T','T_A'])]
         bim_gcat[[1]].to_csv(header+'_GCATs_to_remove.txt',sep='\t',header=None,index=None)
         return
     bim_no_gcat=bim[bim['geno'].isin(['A_C','A_G','C_A','C_T','G_A','G_T'])]
