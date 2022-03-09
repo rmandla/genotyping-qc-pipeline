@@ -273,4 +273,4 @@ def run_qc(plink2,directory,header,ancestry_file_path,ancestry_matrix,pheno_file
     filter_tables(plink2,directory,header,ancestries,miss_cutoff=miss_cutoff,test_missing_cutoff=test_missing_cutoff,maf_cutoff=maf_cutoff,hwe_cutoff=hwe_cutoff)
     sex_check(plink2,header,ancestries,ancestry_file_path,ancestry_matrix,ancestry_file_anccolname=ancestry_file_anccolname,ancestry_file_idcolname=ancestry_file_idcolname)
     remove_gcat_dups(plink2,header)
-    subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02.sexcheck_het_out_no_GCATs_no_DUPS','--maf','0.0005','--make-bed','--out',header+'.clean.snps1.mind.0.02.sexcheck_het_out_no_GCATs_no_DUPS_maf_0.0005'])
+    subprocess.run([plink2,'--bfile',header+'.clean.snps1.mind.0.02.sexcheck_het_out_no_GCATs_no_DUPS','--maf',maf_cutoff,'--make-bed','--out',header+'.clean.snps1.mind.0.02.sexcheck_het_out_no_GCATs_no_DUPS_maf_'+str(maf_cutoff)])
