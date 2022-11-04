@@ -1,4 +1,4 @@
-# Pipeline for QC Genotyping Data
+# Pipeline to QC Genotyping Data
 
 Ravi M, Philip S, Josep M
 
